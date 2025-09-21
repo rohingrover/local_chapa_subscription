@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Chapa Subscription Plugin for Moodle
 
 ## Overview
@@ -534,3 +535,7 @@ All email templates can be customized through the admin settings:
 The Chapa Subscription plugin provides a complete subscription management solution for Moodle, offering seamless integration with Chapa payment gateway, comprehensive content restriction capabilities, and robust admin management tools. With proper configuration and maintenance, it can significantly enhance your Moodle site's monetization capabilities while providing users with a smooth subscription experience.
 
 For additional support or feature requests, please refer to the plugin documentation or contact the development team.
+=======
+# local_chapa_subscription
+Plugin for Lucy Bridge Academy Moodle
+>>>>>>> ba04a037e941399edff4e270af4d9c1940f12995
