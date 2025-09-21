@@ -1,0 +1,44 @@
+# Moodle specific
+config.php
+moodledata/
+cache/
+temp/
+sessions/
+localcache/
+trashdir/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Log files
+*.log
+error.log
+access.log
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Test files
+test_*.html
+test_*.php
+simple_test.html
+debug_*.php
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,199 @@
+/**
+ * Styles for subscription modal and course restrictions
+ * 
+ * @package    local_chapa_subscription
+ * @copyright  2024 LucyBridge Academy
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/* Subscription Modal Styles */
+.subscription-modal-content {
+    padding: 20px;
+}
+
+.subscription-modal-content .alert {
+    margin-bottom: 20px;
+}
+
+.subscription-modal-content .alert h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.current-plan-info {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.current-plan-info p {
+    margin-bottom: 5px;
+}
+
+.subscription-benefits {
+    margin-bottom: 20px;
+}
+
+.subscription-benefits h6 {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.subscription-benefits ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.subscription-benefits li {
+    padding: 5px 0;
+    position: relative;
+    padding-left: 20px;
+}
+
+.subscription-benefits li:before {
+    content: "✓";
+    color: #28a745;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+.subscription-plans-preview {
+    margin-top: 20px;
+}
+
+.subscription-plans-preview h6 {
+    color: #007bff;
+    margin-bottom: 15px;
+}
+
+.plan-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.plan-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.plan-card h6 {
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.plan-card .price {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #28a745;
+    margin-bottom: 15px;
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.plan-features li {
+    padding: 5px 0;
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+/* Course Restriction Styles */
+.cohort-restriction-message {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 10px 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cohort-restriction-message:hover {
+    background: #ffeaa7;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.cohort-restriction-message .restriction-icon {
+    color: #856404;
+    margin-right: 8px;
+}
+
+.cohort-restriction-message .restriction-text {
+    color: #856404;
+    font-weight: 500;
+}
+
+.cohort-restriction-message .upgrade-text {
+    color: #007bff;
+    font-size: 0.9em;
+    margin-top: 5px;
+}
+
+/* Restricted Content Styles */
+.restricted-content {
+    opacity: 0.6;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.restricted-content:before {
+    content: "🔒";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    z-index: 10;
+}
+
+.restricted-content:hover {
+    opacity: 0.8;
+}
+
+/* Lock Icon Styles */
+.lock-icon {
+    color: #dc3545;
+    margin-right: 5px;
+}
+
+/* Subscription Button Styles */
+.subscription-btn {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.subscription-btn:hover {
+    background: linear-gradient(45deg, #0056b3, #004085);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .subscription-plans-preview .row {
+        flex-direction: column;
+    }
+    
+    .plan-card {
+        margin-bottom: 10px;
+    }
+    
+    .subscription-modal-content {
+        padding: 15px;
+    }
+}

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/chapa_subscription/db" VERSION="20241201" COMMENT="XMLDB file for Moodle local/chapa_subscription"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <!-- Plans table -->
+    <TABLE NAME="local_chapa_plans" COMMENT="Subscription plans configuration">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="shortname" TYPE="char" LENGTH="50" NOTNULL="true" COMMENT="Plan shortname (basic, standard, premium)"/>
+        <FIELD NAME="fullname" TYPE="char" LENGTH="255" NOTNULL="true" COMMENT="Full plan name"/>
+        <FIELD NAME="monthlyprice" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Price per month in cents"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" COMMENT="Plan description"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Timestamp created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Timestamp modified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="shortname" TYPE="unique" FIELDS="shortname"/>
+      </KEYS>
+    </TABLE>
+
+    <!-- Subscriptions table -->
+    <TABLE NAME="local_chapa_subscriptions" COMMENT="User subscriptions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Moodle user ID"/>
+        <FIELD NAME="planid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Plan ID"/>
+        <FIELD NAME="starttime" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Start timestamp"/>
+        <FIELD NAME="endtime" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="End timestamp"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="pending" COMMENT="active, pending, cancelled, expired"/>
+        <FIELD NAME="chapa_customer_id" TYPE="char" LENGTH="255" NOTNULL="false" COMMENT="Chapa customer/token ID"/>
+        <FIELD NAME="chapa_subscription_id" TYPE="char" LENGTH="255" NOTNULL="false" COMMENT="Chapa subscription reference"/>
+        <FIELD NAME="recurring_token" TYPE="char" LENGTH="255" NOTNULL="false" COMMENT="Token for auto-renewal"/>
+        <FIELD NAME="auto_renew" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" COMMENT="Auto-renew enabled"/>
+        <FIELD NAME="lastpaymentid" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="Last payment ID"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Timestamp created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Timestamp modified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="planid" TYPE="foreign" FIELDS="planid" REFTABLE="local_chapa_plans" REFFIELDS="id"/>
+        <KEY NAME="lastpaymentid" TYPE="foreign" FIELDS="lastpaymentid" REFTABLE="local_chapa_payments" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid_status" UNIQUE="false" FIELDS="userid, status"/>
+        <INDEX NAME="endtime_status" UNIQUE="false" FIELDS="endtime, status"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Payments table -->
+    <TABLE NAME="local_chapa_payments" COMMENT="Payment transactions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="User ID"/>
+        <FIELD NAME="subscriptionid" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="Subscription ID"/>
+        <FIELD NAME="amount" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Paid amount after discount in cents"/>
+        <FIELD NAME="currency" TYPE="char" LENGTH="3" NOTNULL="true" DEFAULT="ETB" COMMENT="Currency code"/>
+        <FIELD NAME="months" TYPE="int" LENGTH="2" NOTNULL="true" COMMENT="Duration (1,3,6,12)"/>
+        <FIELD NAME="discount_percent" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" COMMENT="Applied discount percentage"/>
+        <FIELD NAME="chapa_txn_id" TYPE="char" LENGTH="255" NOTNULL="false" COMMENT="Chapa transaction ID"/>
+        <FIELD NAME="chapa_status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="pending" COMMENT="Payment status"/>
+        <FIELD NAME="payment_method" TYPE="char" LENGTH="50" NOTNULL="false" COMMENT="Payment method (card, wallet, etc)"/>
+        <FIELD NAME="created_at" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Timestamp created"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="subscriptionid" TYPE="foreign" FIELDS="subscriptionid" REFTABLE="local_chapa_subscriptions" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="chapa_txn_id" UNIQUE="true" FIELDS="chapa_txn_id"/>
+        <INDEX NAME="userid_created" UNIQUE="false" FIELDS="userid, created_at"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Settings table -->
+    <TABLE NAME="local_chapa_settings" COMMENT="Plugin settings">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" COMMENT="Setting name"/>
+        <FIELD NAME="value" TYPE="text" NOTNULL="false" COMMENT="Setting value"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Timestamp created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Timestamp modified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="name" TYPE="unique" FIELDS="name"/>
+      </KEYS>
+    </TABLE>
+
+
+    <!-- Reminders table -->
+    <TABLE NAME="local_chapa_reminders" COMMENT="Email reminders sent to users">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="subscriptionid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Subscription ID"/>
+        <FIELD NAME="type" TYPE="char" LENGTH="50" NOTNULL="true" COMMENT="Reminder type"/>
+        <FIELD NAME="sent_at" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Timestamp sent"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Timestamp created"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="subscriptionid" TYPE="foreign" FIELDS="subscriptionid" REFTABLE="local_chapa_subscriptions" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="subscriptionid_type" UNIQUE="true" FIELDS="subscriptionid, type"/>
+      </INDEXES>
+    </TABLE>
+
+    <!-- Downgrade requests table -->
+    <TABLE NAME="local_chapa_downgrade_requests" COMMENT="Scheduled downgrade requests">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="User ID"/>
+        <FIELD NAME="current_plan_id" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Current plan ID"/>
+        <FIELD NAME="target_plan_id" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Target plan ID"/>
+        <FIELD NAME="requested_at" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Request timestamp"/>
+        <FIELD NAME="scheduled_for" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Scheduled execution timestamp"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="pending" COMMENT="Request status"/>
+        <FIELD NAME="executed_at" TYPE="int" LENGTH="10" NOTNULL="false" COMMENT="Execution timestamp"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="index" FIELDS="userid"/>
+        <KEY NAME="status" TYPE="index" FIELDS="status"/>
+      </KEYS>
+    </TABLE>
+
+    <!-- Downgrades table -->
+    <TABLE NAME="local_chapa_downgrades" COMMENT="Completed downgrades">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="User ID"/>
+        <FIELD NAME="subscription_id" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Subscription ID"/>
+        <FIELD NAME="from_plan_id" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Previous plan ID"/>
+        <FIELD NAME="to_plan_id" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="New plan ID"/>
+        <FIELD NAME="downgraded_at" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Downgrade timestamp"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="completed" COMMENT="Downgrade status"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="index" FIELDS="userid"/>
+        <KEY NAME="subscription_id" TYPE="index" FIELDS="subscription_id"/>
+      </KEYS>
+    </TABLE>
+
+    <!-- Plan changes table -->
+    <TABLE NAME="local_chapa_plan_changes" COMMENT="Plan change history">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="subscription_id" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Subscription ID"/>
+        <FIELD NAME="old_plan_id" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Previous plan ID"/>
+        <FIELD NAME="new_plan_id" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="New plan ID"/>
+        <FIELD NAME="changed_by" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="User who made the change"/>
+        <FIELD NAME="change_reason" TYPE="char" LENGTH="255" NOTNULL="false" COMMENT="Reason for change"/>
+        <FIELD NAME="changed_at" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Change timestamp"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="subscription_id" TYPE="index" FIELDS="subscription_id"/>
+        <KEY NAME="changed_by" TYPE="index" FIELDS="changed_by"/>
+      </KEYS>
+    </TABLE>
+
+    <!-- Refunds table -->
+    <TABLE NAME="local_chapa_refunds" COMMENT="Refund records">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="subscription_id" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Subscription ID"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="User ID"/>
+        <FIELD NAME="amount" TYPE="decimal" LENGTH="10" NOTNULL="true" COMMENT="Refund amount"/>
+        <FIELD NAME="reason" TYPE="text" NOTNULL="true" COMMENT="Refund reason"/>
+        <FIELD NAME="processed_by" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Admin who processed refund"/>
+        <FIELD NAME="processed_at" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Refund timestamp"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="processed" COMMENT="Refund status"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="subscription_id" TYPE="index" FIELDS="subscription_id"/>
+        <KEY NAME="userid" TYPE="index" FIELDS="userid"/>
+      </KEYS>
+    </TABLE>
+
+    <!-- Cancellations table -->
+    <TABLE NAME="local_chapa_cancellations" COMMENT="Subscription cancellations">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="subscription_id" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Subscription ID"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="User ID"/>
+        <FIELD NAME="cancelled_at" TYPE="int" LENGTH="10" NOTNULL="true" COMMENT="Cancellation timestamp"/>
+        <FIELD NAME="reason" TYPE="text" NOTNULL="false" COMMENT="Cancellation reason"/>
+        <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="cancelled" COMMENT="Cancellation status"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="subscription_id" TYPE="index" FIELDS="subscription_id"/>
+        <KEY NAME="userid" TYPE="index" FIELDS="userid"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
